@@ -50,11 +50,1244 @@ int main() {
 <p>cd downloads</p>
 <p>cc gnuplot_ex1.c</p>
 <p>./a.out</p>
-<p><br/><img alt="" height="200" src="/images/gnuplot_ex1.png" width="400"/></p><h1>w6</h1>
+<p><br/><img alt="" height="200" src="/images/gnuplot_ex1.png" width="400"/></p>
+<h1>w6</h1>
+<h4>台灣國旗 ROC</h4>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">// https://en.wikipedia.org/wiki/Flag_of_the_Republic_of_China
+// cc roc_flag.c -lgd -lm to link with gd and math library
+// https://www.rapidtables.com/web/color/RGB_Color.html
+// 幾何形狀著色與繪圖練習
+// 以下 gd 繪圖程式嘗試畫出 ROC 國旗, 請根據下列程式內容完成後續的國旗繪圖
+#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+ 
+void draw_roc_flag(gdImagePtr img);
+void draw_white_sun(gdImagePtr img, int center_x, int center_y, int sun_radius, int white, int red, int blue);
+ 
+int main() {
+    // width 3: height 2
+    int width = 1200;
+    int height = (int)(width*2.0 / 3.0);
+ 
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+ 
+    draw_roc_flag(img);
+ 
+    FILE *outputFile = fopen("./roc_flag.png", "wb");
+    if (outputFile == NULL) {
+        fprintf(stderr, "Error opening the output file.\n");
+        return 1;
+    }
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+    return 0;
+}
+ 
+void draw_roc_flag(gdImagePtr img) {
+    int width = gdImageSX(img);
+    int height = gdImageSY(img);
+    int red, white, blue;
+    int center_x = (int)(width/4);
+    int center_y = (int)(height/4);
+    int sun_radius = (int)(width/8);
+ 
+    // Colors for the flag
+    red = gdImageColorAllocate(img, 242, 0, 0); // Red color
+    white = gdImageColorAllocate(img, 255, 255, 255); // White stripes
+    blue = gdImageColorAllocate(img, 0, 41, 204); // Blue
+ 
+    // 繪製紅色矩形區域
+    gdImageFilledRectangle(img, 0, 0, width, height, red);
+ 
+    // 繪製藍色矩形區域
+    gdImageFilledRectangle(img, 0, 0, (int)(width/2.0), (int)(height/2.0), blue);
+ 
+    // 繪製太陽
+    draw_white_sun(img, center_x, center_y, sun_radius, white, red, blue);
+}
+void draw_white_sun(gdImagePtr img, int center_x, int center_y, int sun_radius, int white, int red, int blue) {
+    float angle = 0;
+    int numRays = 12; // 光芒的數量
+ 
+    gdPoint points[3]; // 三個頂點的陣列
+ 
+    for (int i = 0; i &lt; numRays; i++) {
+        angle = i * (2 * M_PI / numRays);
+        float x1 = center_x + cos(angle) * sun_radius;
+        float y1 = center_y + sin(angle) * sun_radius;
+ 
+        // 調整兩個底邊頂點的位置
+      float x2 = center_x + cos(angle + 0.35) * (sun_radius * 0.5);
+      float y2 = center_y + sin(angle + 0.35) * (sun_radius * 0.5);
+      float x3 = center_x + cos(angle - 0.35) * (sun_radius * 0.5);
+      float y3 = center_y + sin(angle - 0.35) * (sun_radius * 0.5);
+ 
+        // 設定多邊形的三個頂點
+        points[0].x = (int)x1;
+        points[0].y = (int)y1;
+        points[1].x = (int)x2;
+        points[1].y = (int)y2;
+        points[2].x = (int)x3;
+        points[2].y = (int)y3;
+ 
+        gdImageFilledPolygon(img, points, 3, white);
+    }
+  //外圈
+  gdImageFilledEllipse(img, center_x, center_y, sun_radius * 1.2, sun_radius * 1.2, blue);
+ 
+    // 繪製太陽內部
+    gdImageFilledEllipse(img, center_x, center_y, sun_radius * 1.1, sun_radius * 1.1, white);
+}</pre>
+<p>clear</p>
+<p>cd downloads</p>
+<p>cc gd_roc_flag.c -lgd -lm</p>
+<p>./a.out</p>
+<p><img alt="" height="267" src="/images/roc_flag.png" width="400"/></p>
+<p></p>
+<h4>美國國旗 USA </h4>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">// https://en.wikipedia.org/wiki/Flag_of_the_United_States
+// https://www.britannica.com/topic/flag-of-the-United-States-of-America
+// 以下為幾乎要繪製完成的美國國旗, 請修改下列原始碼, 令其繪出正確的美國國旗
+#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+ 
+void draw_usa_flag(gdImagePtr img);
+void draw_star(gdImagePtr img, int x, int y, int size, int color, double rotation_angle);
+ 
+int main() {
+    int width = 800;
+    int height = (int)(width / 1.9);
+ 
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+ 
+    draw_usa_flag(img);
+ 
+    FILE *outputFile = fopen("./../images/usa_flag.png", "wb");
+    if (outputFile == NULL) {
+        fprintf(stderr, "打開輸出檔案時出錯。\n");
+        return 1;
+    }
+ 
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+ 
+    return 0;
+}
+ 
+void draw_usa_flag(gdImagePtr img) {
+    int width = gdImageSX(img);
+    int height = gdImageSY(img);
+    int red, white, blue;
+    // 國旗顏色
+    red = gdImageColorAllocate(img, 178, 34, 52); // 紅色條紋
+    white = gdImageColorAllocate(img, 255, 255, 255); // 白色條紋
+    blue = gdImageColorAllocate(img, 60, 59, 110); // 藍色矩形
+ 
+    int stripe_height = height / 13;
+    int stripe_width = width;
+    int star_size = (int)(0.0308 * height); // 星星大小
+ 
+    for (int y = 0; y &lt; height; y += stripe_height) {
+        if (y / stripe_height % 2 == 0) {
+            gdImageFilledRectangle(img, 0, y, stripe_width, y + stripe_height, red);
+        } else {
+            gdImageFilledRectangle(img, 0, y, stripe_width, y + stripe_height, white);
+        }
+    }
+ 
+    gdImageFilledRectangle(img, 0, 0, width * 2 / 5, stripe_height * 7, blue);
+ 
+    int star_spacing_x = (int)(0.129 * height); // 橫向星星之間的間距
+    int star_spacing_y = (int)(0.054 * height); // 縱向星星之間的間距
+    int star_start_x = (int)(0.125 * height); // 星星的起始X位置
+    int star_start_y = (int)(0.0485 * height); // 星星的起始Y位置
+ 
+    for (int row = 0; row &lt; 9; row++) {
+        int starsPerRow = (row % 2 == 0) ? 6 : 5;
+ 
+        // 計算2、4、6和8排星星的偏移量
+        int offset_x = (row % 2 == 0) ? star_spacing_x / -2 : 0;
+ 
+        for (int star = 0; star &lt; starsPerRow; star++) {
+            int x = star_start_x + star * star_spacing_x + offset_x;
+ 
+            // 旋轉角度（以弧度為單位）
+            double rotation_angle = M_PI / 5; // 忘記多少度的旋轉
+ 
+            int y = star_start_y + row * star_spacing_y;
+            draw_star(img, x, y, star_size, white, rotation_angle);
+        }
+    }
+}
+ 
+void draw_star(gdImagePtr img, int x, int y, int size, int color, double rotation_angle) {
+    gdPoint points[10];
+ 
+    for (int i = 0; i &lt; 10; i++) {
+        double angle = M_PI / 2 + i * 2 * M_PI / 10 + rotation_angle;
+        int radius = (i % 2 == 0) ? size : size / 2;
+        points[i].x = x + radius * cos(angle);
+        points[i].y = y + radius * sin(angle);
+    }
+ 
+    // 用指定的顏色填充星星
+    gdImageFilledPolygon(img, points, 10, color);
+}</pre>
+<p>clear</p>
+<p>cd downloads</p>
+<p>cc gd_usa_flag.c -lgd -lm</p>
+<p>./a.out</p>
+<p><img alt="" height="211" src="/images/usa_flag.png" width="400"/></p>
 <p></p>
 <h1>w7</h1>
+<h4>中國國旗 CHINA</h4>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+  
+void draw_japan_flag(gdImagePtr img);
+void draw_white_sun(gdImagePtr img, int center_x, int center_y, int sun_radius, int white, int red );
+  
+int main() {
+    // width 3: height 2
+    int width = 1200;
+    int height = 2 * width / 3;
+  
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+  
+    draw_japan_flag(img);
+  
+    FILE *outputFile = fopen("./../images/japan_flag.png", "wb");
+    if (outputFile == NULL) {
+        fprintf(stderr, "Error opening the output file.\n");
+        return 1;
+    }
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+    return 0;
+}
+  
+void draw_japan_flag(gdImagePtr img) {
+    int width = gdImageSX(img);
+    int height = gdImageSY(img);
+    int red, white ;
+    int center_x =  0.5 * width;
+    int center_y =  0.5 * height;
+    int sun_radius = 145 ;
+  
+    // Colors for the flag
+    red = gdImageColorAllocate(img, 242, 0, 0); // Red color
+    white = gdImageColorAllocate(img, 255, 255, 255); // White stripes
+     
+  
+    // 繪製白色矩形區域
+    gdImageFilledRectangle(img, 0, 0, width, height, white);
+  
+  
+    // 繪製太陽內部
+    gdImageFilledEllipse(img, center_x, center_y, sun_radius * 3, sun_radius * 3, red);
+}</pre>
 <p></p>
+<p>clear</p>
+<p>cd downloads</p>
+<p>cc gd_proc_flag.c -lgd -lm</p>
+<p>./a.out</p>
+<p><img alt="" height="267" src="/images/proc_flag.png" width="400"/></p>
+<h4></h4>
+<p>英國國旗 UK</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+  
+void draw_uk_flag(gdImagePtr img);
+void fillTriangle(gdImagePtr img, int x1, int y1, int x2, int y2, int x3, int y3, int color);
+  
+int main() {
+    // 設定國旗的寬和高
+    int width = 1200;
+    int height = width / 2;
+  
+    // 建立圖像
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+  
+    // 繪製英國國旗
+    draw_uk_flag(img);
+  
+    // 將圖像保存到檔案
+    FILE *outputFile = fopen("./../images/uk_flag.png", "wb");
+    if (outputFile == NULL) {
+        fprintf(stderr, "打開輸出檔案時發生錯誤。\n");
+        return 1;
+    }
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+    return 0;
+}
+  
+  
+  
+void draw_uk_flag(gdImagePtr img) {
+    int width = gdImageSX(img);
+    int height = gdImageSY(img);
+  
+    int red, white, blue;
+    red = gdImageColorAllocate(img, 204, 0, 0);       // 紅色
+    white = gdImageColorAllocate(img, 255, 255, 255); // 白色
+    blue = gdImageColorAllocate(img, 0, 0, 153);      // 藍色
+  
+    gdImageFilledRectangle(img, 0, 0, width, height, blue);
+  
+  
+  int x1, y1, x2, y2, x3, y3;
+  {
+    int line_thickness = 100;
+    gdImageSetThickness(img, line_thickness);
+  
+    int x1, y1, x2, y2, x3, y3;
+  
+    // 繪製白色斜線
+    x1 = 0;
+    y1 = 600;
+    x2 = 1200;
+    y2 = 0;
+    gdImageLine(img, x1, y1, x2, y2, white);
+  
+    x1 = 0;
+    y1 = 0;
+    x2 = 1200;
+    y2 = 600;
+    gdImageLine(img, x1, y1, x2, y2, white);
+}
+  {
+    int line_thickness = 33;
+    gdImageSetThickness(img, line_thickness);
+  
+      
+    // 繪製紅色斜線
+    x1 = 566;
+    y1 = 300;
+    x2 = 1166;
+    y2 = 0;
+    gdImageLine(img, x1, y1, x2, y2, red);
+  
+    x1 = 1233;
+    y1 = 600;
+    x2 = 633;
+    y2 = 300;
+    gdImageLine(img, x1, y1, x2, y2, red);
+  
+    x1 = 566;
+    y1 = 300;
+    x2 = -33;
+    y2 = 0;
+    gdImageLine(img, x1, y1, x2, y2, red);
+  
+    x1 = 600;
+    y1 = 316.5;
+    x2 = 0;
+    y2 = 616.5;
+    gdImageLine(img, x1, y1, x2, y2, red);
+  }
+  {
+  int line_thickness = 33;
+  gdImageSetThickness(img, line_thickness);
+  
+  int x1, y1, x2, y2, x3, y3;
+    
+  // 繪製  斜線
+  x1 = 0;
+  y1 = 600;
+  x2 = 1200;
+  y2 = 0;
+  gdImageLine(img, x1, y1, x2, y2, red );
+    
+    
+  x1 = 1200;
+    y1 = 16.5;
+    x2 = 600;
+    y2 = 316.5;
+    gdImageLine(img, x1, y1, x2, y2, white);
+  
+  
+  x1 = 0;
+    y1 = 583.5;
+    x2 = 600;
+    y2 = 283.5;
+    gdImageLine(img, x1, y1, x2, y2, white);
+      
+    
+  }
+    
+    // 繪製白色十字
+    int cross_width = width / 32;
+    int cross_arm_width = width / 32;
+    int center_x = width / 2;
+    int center_y = height / 2;
+  
+    gdImageFilledRectangle(img, center_x + 2.7 * cross_width, 0, center_x - 2.7 * cross_width, height, white);
+    gdImageFilledRectangle(img, 0, center_y + 2.7 * cross_arm_width, width, center_y - 2.7 * cross_arm_width, white);
+  
+    // 繪製紅色十字
+    gdImageFilledRectangle(img, center_x + 1.5 * cross_width, 0, center_x - 1.5 * cross_width, height, red);
+    gdImageFilledRectangle(img, 0, center_y + 1.5 * cross_arm_width, width, center_y - 1.5 * cross_arm_width, red);
+}</pre>
+<p>clear</p>
+<p>cd downloads</p>
+<p>cc gd_uk_flag.c -lgd -lm</p>
+<p>./a.out</p>
+<p><img alt="" height="200" src="/images/uk_flag.png" width="400"/></p>
+<h4>韓國國旗 KOREA</h4>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+  
+#define WIDTH 900
+#define HEIGHT 600
+#define FILENAME "south_korea_flag.png"
+  
+int main() {
+    gdImagePtr im;
+    FILE *pngout;
+    int white, black, red, blue;
+  
+    im = gdImageCreate(WIDTH, HEIGHT);
+  
+    white = gdImageColorAllocate(im, 255, 255, 255);
+    black = gdImageColorAllocate(im, 0, 0, 0);
+    red = gdImageColorAllocate(im, 205, 0, 0);
+    blue = gdImageColorAllocate(im, 0, 56, 168);
+  
+    // Background (white)
+    gdImageFilledRectangle(im, 0, 0, WIDTH, HEIGHT , white);
+  
+    // Blue Circle (Yin-Yang Symbol)
+    gdImageFilledArc(im, WIDTH / 2, HEIGHT / 2, WIDTH / 3, HEIGHT / 2, 210, 30, red, gdArc);
+  
+    // Red Circle (Yin-Yang Symbol)
+    gdImageFilledArc(im, WIDTH / 2, HEIGHT / 2, WIDTH / 3, HEIGHT / 2, 30, 210, blue, gdArc);
+  
+  int circleX = 385;    // 圓心的 X 座標
+  int circleY = 262.5;   // 圓心的 Y 座標
+  int circleRadius = 75;     
+  
+  // 繪製圓形
+  gdImageFilledEllipse(im, circleX, circleY, circleRadius * 2, circleRadius * 2, red);
+  
+  int circleX2 = 515;    // 圓心的 X 座標
+    
+ int circleY2 = 337.5;
+  
+  // 繪製圓形
+  gdImageFilledEllipse(im, circleX2, circleY2, circleRadius * 2, circleRadius * 2, blue);
+    
+  {
+      
+    
+  // 起點和終點位置
+    
+  int startX = 340;    
+  // 線的起點 X 座標
+    
+  int startY = 90;   
+  // 線的起點 Y 座標
+    
+  int endX = 200;     
+  // 線的終點 X 座標
+    
+  int endY = 260;     
+  // 線的終點 Y 座標
+   
+  int lineWidth = 23;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX, startY, endX, endY, black);
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX -35, startY -10, endX -35, endY -10, black);
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX -70, startY -20, endX -70, endY -20, black);
+  
+  int startX2 = 213;    
+  // 線的起點 X 座標
+  
+  int startY2 = 270;   
+  // 線的起點 Y 座標
+  
+  int endX2 = 133;     
+  // 線的終點 X 座標
+  
+  int endY2 = 210;     
+  // 線的終點 Y 座標
+  
+  int lineWidth2 = 25;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX2 +3, startY2, endX2 +3, endY2, white);
+  
+  gdImageSetThickness(im, lineWidth +10);
+gdImageLine(im, startX2 -17, startY2 +9 , endX2 -17, endY2 +9 , white);
+  
+  gdImageSetThickness(im, lineWidth );
+gdImageLine(im, startX2 +115, startY2 -145, endX2 +115, endY2 -145, white);
+  
+  gdImageSetThickness(im, lineWidth);
+gdImageLine(im, startX2 +120, startY2 -155, endX2 +120, endY2 -155, white);
+  
+  gdImageSetThickness(im, lineWidth +12);
+gdImageLine(im, startX2 +145, startY2 -155, endX2 +145, endY2 -155, white);
+}
+  {
+    // 起點和終點位置
+    
+  int startX = 330;    
+  // 線的起點 X 座標
+    
+  int startY = 520;   
+  // 線的起點 Y 座標
+    
+  int endX = 190;     
+  // 線的終點 X 座標
+    
+  int endY = 350;     
+  // 線的終點 Y 座標
+   
+  int lineWidth = 23;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX, startY, endX, endY, black);
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX -35, startY +10, endX -35, endY +10, black);
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX -70, startY +20, endX -70, endY +20, black);
+  
+  int startX2 = 213;    
+  // 線的起點 X 座標
+  
+  int startY2 = 330;   
+  // 線的起點 Y 座標
+  
+  int endX2 = 133;     
+  // 線的終點 X 座標
+  
+  int endY2 = 390;     
+  // 線的終點 Y 座標
+  
+  int lineWidth2 = 25;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth +8);
+  gdImageLine(im, startX2 -11, startY2, endX2 -11, endY2, white);
+  
+  gdImageSetThickness(im, lineWidth +10);
+gdImageLine(im, startX2 -30, startY2 -9 , endX2 -30, endY2 -9 , white);
+  
+  gdImageSetThickness(im, lineWidth );
+gdImageLine(im, startX2 +100, startY2 +150, endX2 +100, endY2 +150, white);
+  
+  gdImageSetThickness(im, lineWidth);
+gdImageLine(im, startX2 +120, startY2 +155, endX2 +120, endY2 +155, white);
+  
+  gdImageSetThickness(im, lineWidth +14);
+gdImageLine(im, startX2 +145, startY2 +157, endX2 +145, endY2 +157, white);
+  
+    gdImageSetThickness(im, lineWidth -10);
+gdImageLine(im, 232, 426, 206, 448, white);
+  
+  }
+  
+  {
+    // 起點和終點位置
+    
+  int startX = 564;    
+  // 線的起點 X 座標
+    
+  int startY = 520;   
+  // 線的起點 Y 座標
+    
+  int endX = 704;     
+  // 線的終點 X 座標
+    
+  int endY = 350;     
+  // 線的終點 Y 座標
+   
+  int lineWidth = 23;  // 線的寬度
+      
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX +70, startY +20, endX +70, endY +20, black);
+  
+    // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX, startY, endX, endY, black);
+  
+    // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX +35, startY +10, endX +35, endY +10, black);
+      
+gdImageSetThickness(im, lineWidth -10);
+gdImageLine(im, 624, 400, 734, 490, white);
+      
+  int startX2 = 553;    
+  // 線的起點 X 座標
+  
+  int startY2 = 330;   
+  // 線的起點 Y 座標
+  
+  int endX2 = 633;     
+  // 線的終點 X 座標
+  
+  int endY2 = 390;     
+  // 線的終點 Y 座標
+  
+  int lineWidth2 = 25;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth +8);
+  gdImageLine(im, startX2 +139, startY2, endX2 +139, endY2, white);
+  
+  gdImageSetThickness(im, lineWidth +10);
+gdImageLine(im, startX2 +157, startY2 -9 , endX2 +157, endY2 -9 , white);
+  
+  gdImageSetThickness(im, lineWidth);
+gdImageLine(im, startX2 +25, startY2 +155, endX2 +25, endY2 +155, white);
+  
+  gdImageSetThickness(im, lineWidth +30);
+gdImageLine(im, startX2 -3, startY2 +170, endX2 , endY2 +170, white);
+  }
+  {
+    // 起點和終點位置
+    
+  int startX = 330;    
+  // 線的起點 X 座標
+    
+  int startY = 520;   
+  // 線的起點 Y 座標
+    
+  int endX = 190;     
+  // 線的終點 X 座標
+    
+  int endY = 350;     
+  // 線的終點 Y 座標
+   
+  int lineWidth = 23;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX, startY, endX, endY, black);
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX -35, startY +10, endX -35, endY +10, black);
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX -70, startY +20, endX -70, endY +20, black);
+  
+  int startX2 = 213;    
+  // 線的起點 X 座標
+  
+  int startY2 = 330;   
+  // 線的起點 Y 座標
+  
+  int endX2 = 133;     
+  // 線的終點 X 座標
+  
+  int endY2 = 390;     
+  // 線的終點 Y 座標
+  
+  int lineWidth2 = 25;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth +8);
+  gdImageLine(im, startX2 -11, startY2, endX2 -11, endY2, white);
+  
+  gdImageSetThickness(im, lineWidth +10);
+gdImageLine(im, startX2 -30, startY2 -9 , endX2 -30, endY2 -9 , white);
+  
+  gdImageSetThickness(im, lineWidth );
+gdImageLine(im, startX2 +100, startY2 +150, endX2 +100, endY2 +150, white);
+  
+  gdImageSetThickness(im, lineWidth);
+gdImageLine(im, startX2 +120, startY2 +155, endX2 +120, endY2 +155, white);
+  
+  gdImageSetThickness(im, lineWidth +14);
+gdImageLine(im, startX2 +145, startY2 +157, endX2 +145, endY2 +157, white);
+  
+    gdImageSetThickness(im, lineWidth -10);
+gdImageLine(im, 232, 426, 206, 448, white);
+  
+  }
+  {
+    // 起點和終點位置
+    
+  int startX = 564;    
+  // 線的起點 X 座標
+    
+  int startY = 97;   
+  // 線的起點 Y 座標
+    
+  int endX = 704;     
+  // 線的終點 X 座標
+    
+  int endY = 267;     
+  // 線的終點 Y 座標
+   
+  int lineWidth = 23;  // 線的寬度
+      
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX +70, startY -20, endX +70, endY -20, black);
+  
+    // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX, startY, endX, endY, black);
+  
+    gdImageSetThickness(im, lineWidth -10);
+gdImageLine(im, 624, 212, 734, 118, white);
+      
+    // 繪製線段
+  gdImageSetThickness(im, lineWidth);
+  gdImageLine(im, startX +35, startY -10, endX +35, endY -10, black);
+      
+  int startX2 = 553;    
+  // 線的起點 X 座標
+  
+  int startY2 = 277;   
+  // 線的起點 Y 座標
+  
+  int endX2 = 633;     
+  // 線的終點 X 座標
+  
+  int endY2 = 217;     
+  // 線的終點 Y 座標
+  
+  int lineWidth2 = 25;  // 線的寬度
+  
+  // 繪製線段
+  gdImageSetThickness(im, lineWidth +8);
+  gdImageLine(im, startX2 +134, startY2, endX2 +134, endY2, white);
+  
+  gdImageSetThickness(im, lineWidth +10);
+gdImageLine(im, startX2 +157, startY2 +9 , endX2 +157, endY2 +9 , white);
+  
+  gdImageSetThickness(im, lineWidth);
+gdImageLine(im, startX2 +25, startY2 -155, endX2 +25, endY2 -155, white);
+  
+    gdImageSetThickness(im, lineWidth +30);
+gdImageLine(im, startX2 -5, startY2 -155, endX2 -5, endY2 -155, white);
+  
+  }
+    
+    // Save image
+FILE *outputFile = fopen("./../images/korea_flag.png", "wb");
+if (outputFile == NULL) {
+    fprintf(stderr, "Error opening the output file.\n");
+    return 1;
+}
+  gdImagePngEx(im, outputFile, 9);
+      fclose(outputFile);
+      gdImageDestroy(im);
+      return 0;
+  }</pre>
+<p>clear</p>
+<p>cd downloads</p>
+<p>cc gd_korea_flag.c -lgd -lm</p>
+<p>./a.out</p>
+<p><img alt="" height="267" src="/images/korea_flag.png" width="400"/></p>
+<h4>日本國旗 JAPAN</h4>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+  
+void draw_japan_flag(gdImagePtr img);
+void draw_white_sun(gdImagePtr img, int center_x, int center_y, int sun_radius, int white, int red );
+  
+int main() {
+    // width 3: height 2
+    int width = 1200;
+    int height = 2 * width / 3;
+  
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+  
+    draw_japan_flag(img);
+  
+    FILE *outputFile = fopen("./../images/japan_flag.png", "wb");
+    if (outputFile == NULL) {
+        fprintf(stderr, "Error opening the output file.\n");
+        return 1;
+    }
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+    return 0;
+}
+  
+void draw_japan_flag(gdImagePtr img) {
+    int width = gdImageSX(img);
+    int height = gdImageSY(img);
+    int red, white ;
+    int center_x =  0.5 * width;
+    int center_y =  0.5 * height;
+    int sun_radius = 145 ;
+  
+    // Colors for the flag
+    red = gdImageColorAllocate(img, 242, 0, 0); // Red color
+    white = gdImageColorAllocate(img, 255, 255, 255); // White stripes
+     
+  
+    // 繪製白色矩形區域
+    gdImageFilledRectangle(img, 0, 0, width, height, white);
+  
+  
+    // 繪製太陽內部
+    gdImageFilledEllipse(img, center_x, center_y, sun_radius * 3, sun_radius * 3, red);
+}</pre>
+<p></p>
+<p>clear</p>
+<p>cd downloads</p>
+<p>cc gd_japan_flag.c -lgd -lm</p>
+<p>./a.out</p>
+<p><img alt="" height="267" src="/images/japan_flag.png" width="400"/></p>
+<p><video controls="controls" height="630" width="1004">
+<source src="/images/1.mp4" type="video/mp4"/></video></p>
+<p></p><h1>w12</h1>
+<pre class="brush:cpp;auto-links:false;toolbar:false" contenteditable="false">#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+
+int main() {
+    int width = 800;
+    int height = 600;
+
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+
+    FILE *outputFile = fopen("hellogd.png", "wb");
+    if (outputFile == NULL) {
+
+fprintf(stderr, "Error opening the output file.\n");
+
+return 1;
+    }
+
+    int red = gdImageColorAllocate(img, 255, 0, 0);
+    int blue = gdImageColorAllocate(img, 0, 0, 255);
+    int black = gdImageColorAllocate(img, 0, 0, 0);
+    int white = gdImageColorAllocate(img, 255, 255, 255);
+    // 長方形塗色
+    gdImageFilledRectangle(img, 0, 0, width, height, white);
+    gdImageFilledRectangle(img, 0, 0, (int)width/4, (int)height/4, blue);
+    // 橢圓形塗色
+    gdImageFilledEllipse(img, (int)width*3/4, (int)height/4, (int)width/4, (int)width/4, red);
+    // 橢圓形畫線
+    gdImageEllipse(img, (int)width*3/4, (int)height*3/4, (int)width/4, (int)width/4, red);
+    // 畫直線
+    gdImageLine(img, (int)width/2, (int)height/2, (int)width/2, (int)height/2 + 100, blue);
+
+    // 多邊形畫線
+    gdPoint points[4];
+    points[0].x = (int)width/4;
+    points[0].y = (int)height*3/4;
+    points[1].x = points[0].x + 100;
+    points[1].y = points[0].y;
+    points[2].x = points[1].x;
+    points[2].y = points[1].y + 100;
+    points[3].x = points[2].x - 100;
+    points[3].y = points[2].y;
+    gdImagePolygon(img, points, 4, black);
+
+    // 多邊形塗色
+    gdPoint points2[4];
+    points2[0].x = (int)width/3;
+    points2[0].y = (int)height/2;
+    points2[1].x = points2[0].x + 100;
+    points2[1].y = points2[0].y;
+    points2[2].x = points2[1].x;
+    points2[2].y = points2[1].y + 100;
+    points2[3].x = points2[2].x - 150;
+    points2[3].y = points2[2].y;
+    gdImageFilledPolygon(img, points2, 4, red);
+
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+    return 0;
+}</pre>
+<p><img alt="" height="300" src="/images/hellogd.png" width="400"/><br/><br/></p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+
+// Declare the rotation function
+void rotateFilledPolygon(int x_orig, int y_orig, double rotation_ang, gdPoint *points, int num_points) {
+    int i;
+    double angle_rad = rotation_ang * M_PI / 180.0;
+
+    for (i = 0; i &lt; num_points; i++) {
+        int x = points[i].x - x_orig;
+        int y = points[i].y - y_orig;
+
+        points[i].x = x_orig + (int)(x * cos(angle_rad) - y * sin(angle_rad));
+        points[i].y = y_orig + (int)(x * sin(angle_rad) + y * cos(angle_rad));
+    }
+}
+
+int main() {
+    int width = 800;
+    int height = 600;
+
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+
+    FILE *outputFile = fopen("./../images/hellogd2.png", "wb");
+    if (outputFile == NULL) {
+        fprintf(stderr, "Error opening the output file.\n");
+        return 1;
+    }
+
+    int red = gdImageColorAllocate(img, 255, 0, 0);
+    int blue = gdImageColorAllocate(img, 0, 0, 255);
+    int black = gdImageColorAllocate(img, 0, 0, 0);
+    int white = gdImageColorAllocate(img, 255, 255, 255);
+
+    gdImageFilledRectangle(img, 0, 0, width, height, white);
+    gdImageFilledRectangle(img, 0, 0, (int)width / 4, (int)height / 4, blue);
+
+    gdImageFilledEllipse(img, (int)width * 3 / 4, (int)height / 4, (int)width / 4, (int)width / 4, red);
+    gdImageEllipse(img, (int)width * 3 / 4, (int)height * 3 / 4, (int)width / 4, (int)width / 4, red);
+    gdImageLine(img, (int)width / 2, (int)height / 2, (int)width / 2, (int)height / 2 + 100, blue);
+
+    gdPoint points[4];
+    points[0].x = (int)width / 4;
+    points[0].y = (int)height * 3 / 4;
+    points[1].x = points[0].x + 100;
+    points[1].y = points[0].y;
+    points[2].x = points[1].x;
+    points[2].y = points[1].y + 100;
+    points[3].x = points[2].x - 100;
+    points[3].y = points[2].y;
+
+    // Call the rotation function multiple times
+    for (int i = 0; i &lt; 4; i++) {
+        rotateFilledPolygon((int)width / 4 + 50, (int)height * 3 / 4 + 50, 30.0, points, 4);
+        gdImagePolygon(img, points, 4, black);
+    }
+
+    gdPoint points2[4];
+    points2[0].x = (int)width / 3;
+    points2[0].y = (int)height / 2;
+    points2[1].x = points2[0].x + 100;
+    points2[1].y = points2[0].y;
+    points2[2].x = points2[1].x;
+    points2[2].y = points2[1].y + 100;
+    points2[3].x = points2[2].x - 150;
+    points2[3].y = points2[2].y;
+
+    // Call the rotation function multiple times
+    for (int i = 0; i &lt; 12; i++) {
+        //rotateFilledPolygon((int)width / 3 + 50, (int)height / 2 + 50, 30.0, points2, 4);
+        rotateFilledPolygon(500, 200, 30.0, points2, 4);
+        gdImageFilledPolygon(img, points2, 4, red);
+    }
+
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+
+    return 0;
+}</pre>
+<p><img alt="" height="300" src="/images/hellogd2.png" width="400"/></p>
+<h1>w13</h1>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">// 包含標準輸出入程式庫的標頭文件
+#include &lt;stdio.h&gt;
+  
+// 主函式
+int main() {
+    // Open a file to write displacement and velocity data
+    FILE *outputFile = fopen("motion_data.txt", "w");
+    if (!outputFile) {
+        fprintf(stderr, "Failed to create data file.\n");
+        return 1;
+    }
+  
+    // Simulate motion for 10 seconds and calculate displacement and velocity, while writing data to the file
+    double x = 0.2;  // Initial displacement
+    double v = 0.0;  // Initial velocity
+    double dt = 0.01; // Time step
+    double t = 0.0;  // Time
+  
+    while (t &lt;= 10.0) {
+        double acceleration = (-10.0 * x - 0.5 * v) / 1.0; // Modified system parameters here
+        v += acceleration * dt;
+        x += v * dt;
+  
+        fprintf(outputFile, "%lf %lf %lf\n", t, x, v);
+  
+        t += dt;
+    }
+  
+    // Close the data file
+    fclose(outputFile);
+  
+    // Start a Gnuplot process using popen
+    FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
+    if (!gnuplotPipe) {
+        fprintf(stderr, "Failed to start Gnuplot.\n");
+        return 1;
+    }
+  
+    // Use Gnuplot plotting commands, specify font and output as PNG
+    fprintf(gnuplotPipe, "set terminal pngcairo enhanced font 'default,10' size 800,400\n");
+    fprintf(gnuplotPipe, "set output './../images/motion_plot.png'\n");
+    fprintf(gnuplotPipe, "set title 'Displacement and Velocity vs. Time'\n");
+    fprintf(gnuplotPipe, "set xlabel 'Time (s)'\n");
+    fprintf(gnuplotPipe, "set ylabel 'Displacement (m)'\n");
+    fprintf(gnuplotPipe, "plot 'motion_data.txt' using 1:2 with lines lw 2 title 'Displacement', \
+                             'motion_data.txt' using 1:3 with lines lw 2 title 'Velocity'\n");
+  
+    // Close the Gnuplot process
+    fprintf(gnuplotPipe, "exit\n");
+    pclose(gnuplotPipe);
+  
+    return 0;
+}</pre>
+<p>cd downloads</p>
+<p>cc euler_gnuplot_msd_ex1.c</p>
+<p>./a.out</p>
+<p><img alt="" height="200" src="/images/motion_plot.png" width="400"/></p>
+<p><br/><br/></p>
 <h1>w15</h1>
+<p><span>1) 根據 </span><a href="https://nfuedu-my.sharepoint.com/:u:/g/personal/yen_nfu_edu_tw/EVcefUI2zPpAmP6lnLWLEAoBCBznMnvFpsNE-1VVFGvVZQ?e=goiPpP&amp;isSPOFile=1" rel="noreferrer noopener" tabindex="-1" target="_blank" title="https://nfuedu-my.sharepoint.com/:u:/g/personal/yen_nfu_edu_tw/evcefui2zppamp6lnlwleaobcbznmnvfpsne-1vvfgvvzq?e=goippp">roc_list_coord_flag.7z</a><span><span> </span>程式內容所印出的六組 ABED 等繪製 ROC 國旗白日圖案中的菱形四個關鍵點, 請直接在青天與滿地紅的圖案中, 利用白色作為畫線顏色, 將第二組的 ABED 等四個點的座標, 以直線相連.</span></p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">#include &lt;stdio.h&gt;
+#include &lt;gd.h&gt;
+#include &lt;math.h&gt;
+ 
+void draw_roc_flag(gdImagePtr img);
+void draw_white_sun(gdImagePtr img, int x, int y, int size, int color);
+ 
+int main() {
+    // width 3: height 2
+    int width = 1200;
+    // 國旗長寬比為 3:2
+    int height = (int)(width * 2.0 / 3.0);
+ 
+    gdImagePtr img = gdImageCreateTrueColor(width, height);
+    gdImageAlphaBlending(img, 0);
+ 
+    draw_roc_flag(img);
+ 
+    FILE *outputFile = fopen("roc_flag_in_gd.png", "wb");
+    if (outputFile == NULL) {
+        fprintf(stderr, "Error opening the output file.\n");
+        return 1;
+    }
+    gdImagePngEx(img, outputFile, 9);
+    fclose(outputFile);
+    gdImageDestroy(img);
+    return 0;
+}
+ 
+void draw_roc_flag(gdImagePtr img) {
+    int width = gdImageSX(img);
+    int height = gdImageSY(img);
+    int red, white, blue;
+ 
+    // 白日位於青天面積正中央, 因此中心點座標為長寬各 1/4 處
+    int center_x = (int)(width / 4);
+    int center_y = (int)(height / 4);
+ 
+    int sun_radius = (int)(width / 8);
+    int white_circle_dia = sun_radius;
+    int blue_circle_dia = white_circle_dia + white_circle_dia * 2 / 15;
+ 
+    red = gdImageColorAllocate(img, 255, 0, 0); // 紅色
+    white = gdImageColorAllocate(img, 255, 255, 255); // 白色
+    blue = gdImageColorAllocate(img, 0, 0, 149); // 藍色
+ 
+    gdImageFilledRectangle(img, 0, 0, width, height, red);
+    gdImageFilledRectangle(img, 0, 0, (int)(width / 2.0), (int)(height / 2.0), blue);
+    draw_white_sun(img, center_x, center_y, sun_radius, white);
+    gdImageFilledEllipse(img, center_x, center_y, blue_circle_dia, blue_circle_dia, blue);
+    gdImageFilledEllipse(img, center_x, center_y, white_circle_dia, white_circle_dia, white);
+ 
+    // 在青天與滿地紅的圖案中以白色畫線繪製連接菱形的四個關鍵點
+    gdImageSetThickness(img, 10); // 設置線條粗度為10
+    gdImageLine(img, 429, 125, 279, 165, white);
+    gdImageLine(img, 279, 165, 170, 274, white);
+    gdImageLine(img, 170, 274, 170, 274, white);
+    gdImageLine(img, 429, 125, 170, 274, white); // 加入第四條連線
+}
+void draw_white_sun(gdImagePtr img, int x, int y, int size, int color) {
+    // 實現 draw_white_sun 函數的內容
+    // 可以在此處繪製白日的內部圖案
+}
+</pre>
+<p></p>
+<p><span>2) 承上題, 請列出第二組 ABED 的四條直線與白日中的大圓所相交 (intersect) 的四個點座標.</span></p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">// https://en.wikipedia.org/wiki/Flag_of_the_Republic_of_China 
+// 內政部國旗參考資料: https://www.moi.gov.tw/cp.aspx?n=10621 
+// cc roc_flag_in_gd.c -lgd -lm to link with gd and math library 
+// https://www.rapidtables.com/web/color/RGB_Color.html 
+// 幾何形狀著色與繪圖練習 
+// 以下 gd 繪圖程式嘗試畫出 ROC 國旗, 請根據下列程式內容完成後續的國旗繪圖 
+#include &lt;stdio.h&gt; 
+#include &lt;gd.h&gt; 
+#include &lt;math.h&gt; 
+  
+void draw_roc_flag(gdImagePtr img); 
+void draw_white_sun(gdImagePtr img, int x, int y, int size, int color); 
+  
+int main() { 
+    // width 3: height 2 
+    int width = 1200; 
+    // 國旗長寬比為 3:2 
+    int height = (int)(width*2.0 / 3.0); 
+  
+    gdImagePtr img = gdImageCreateTrueColor(width, height); 
+    gdImageAlphaBlending(img, 0); 
+  
+    draw_roc_flag(img); 
+  
+    FILE *outputFile = fopen("roc_flag_in_gd.png", "wb"); 
+    if (outputFile == NULL) { 
+        fprintf(stderr, "Error opening the output file.\n"); 
+        return 1; 
+    } 
+    gdImagePngEx(img, outputFile, 9); 
+    fclose(outputFile); 
+    gdImageDestroy(img); 
+    return 0; 
+} 
+void draw_roc_flag(gdImagePtr img) { 
+    int width = gdImageSX(img); 
+    int height = gdImageSY(img); 
+    int red, white, blue; 
+    // 白日位於青天面積正中央, 因此中心點座標為長寬各 1/4 處 
+    int center_x = (int)(width/4); 
+    int center_y = (int)(height/4); 
+    // gdImageFilledEllipse 需以長寬方向的 diameter 作圖 
+    // 由於中央白日圓形的半徑為青天寬度的 1/8 
+    // 因此中央白日圓形的直徑為青天寬度的 1/4, 也就是國旗寬度的 1/8 
+    // 而且白日十二道光芒的外圍圓形其半徑也是國旗寬度的1/8 
+    int sun_radius = (int)(width/8); 
+    // 中央白日圓形的直徑等於十二道光芒外圍圓形的半徑 
+    int white_circle_dia = sun_radius; 
+    // 中央藍色圓形半徑為中央白日的 1又 2/15 
+    int blue_circle_dia = white_circle_dia +  white_circle_dia*2/15; 
+    // 根據 https://www.moi.gov.tw/cp.aspx?n=10621 訂定國旗三種顏色值 
+    red = gdImageColorAllocate(img, 255, 0, 0); // 紅色 
+    white = gdImageColorAllocate(img, 255, 255, 255); // 白色 
+    blue = gdImageColorAllocate(img, 0, 0, 149); // 藍色 
+    // 根據畫布大小塗上紅色長方形區域 
+    gdImageFilledRectangle(img, 0, 0, width, height, red); 
+    // 青天面積為整面國旗的 1/4, 也是採用長方形塗色 
+    gdImageFilledRectangle(img, 0, 0, (int)(width/2.0), (int)(height/2.0), blue); 
+  {int x1 = 429; 
+   int y1 = 125; 
+   int x2 = 279; 
+   int y2 = 165; 
+   gdImageSetThickness(img, 10); // 設置線條寬度為10
+   gdImageLine(img, x1, y1, x2, y2, white); // 畫線
+   // 畫一條線連接兩個點 
+   gdImageLine(img, x1, y1, x2, y2, white); 
+  } 
+  {int x1 = 170; 
+     int y1 = 274; 
+     int x2 = 279; 
+     int y2 = 165; 
+  
+     // 畫一條線連接兩個點 
+     gdImageLine(img, x1, y1, x2, y2, white); 
+  } 
+  { 
+    int x1 = 170; 
+     int y1 = 274; 
+     int x2 = 429; 
+     int y2 = 125; 
+  
+     // 畫一條線連接兩個點 
+     gdImageLine(img, x1, y1, x2, y2, white); 
+  } 
+  // 利用一個藍色大圓與白色小圓畫出藍色環狀 
+  gdImageFilledEllipse(img, center_x, center_y, blue_circle_dia, blue_circle_dia, blue); 
+  gdImageFilledEllipse(img, center_x, center_y, white_circle_dia, white_circle_dia, white); 
+  
+  
+  // 定義座標結構 
+  typedef struct { 
+      double x; 
+      double y; 
+  } Point; 
+  
+  // 計算圓與線的交點 
+  void circleLineIntersection(double h, double k, double r, double x1, double y1, double x2, double y2) { 
+      // 直線斜率 
+      double m = (y2 - y1) / (x2 - x1); 
+  
+      // 直線方程式中的常數項 
+      double b = y1 - m * x1; 
+  
+      // 圓與直線交點的計算 
+      double A = 1 + pow(m, 2); 
+      double B = 2 * (m * b - m * k - h); 
+      double C = pow(k, 2) - pow(r, 2) + pow(h, 2) - 2 * b * k + pow(b, 2); 
+  
+      // 判斷交點個數 
+    double discriminant = pow(B, 2) - 4 * A * C; 
+    if (discriminant &gt; 0) { 
+        double x_intersect1 = (-B + sqrt(discriminant)) / (2 * A); 
+        double y_intersect1 = m * x_intersect1 + b; 
+        printf("交點: (%.2f, %.2f)\n", x_intersect1, y_intersect1); 
+  
+        double x_intersect2 = (-B - sqrt(discriminant)) / (2 * A); 
+        double y_intersect2 = m * x_intersect2 + b; 
+        printf("交點: (%.2f, %.2f)\n", x_intersect2, y_intersect2); 
+    } else if (discriminant == 0) { 
+        double x_intersect = -B / (2 * A); 
+        double y_intersect = m * x_intersect + b; 
+        printf("交點: (%.2f, %.2f)\n", x_intersect, y_intersect); 
+    } else { 
+        printf("No points.\n"); 
+    } 
+  
+  } 
+      // 圓的參數 
+      double circle_x = (int)(width/4); // 圓心 x 座標 
+      double circle_y = (int)(height/4); // 圓心 y 座標 
+      double radius = white_circle_dia +  white_circle_dia*2/15; // 圓半徑 
+      // 兩點座標 
+  double x3 = 170; 
+  double y3 = 274; 
+  double x4 = 279; 
+  double y4 = 165; 
+  
+  circleLineIntersection(circle_x, circle_y, radius, x4, y4, x3, y3); 
+  
+  double x5 = 279; 
+  double y5 = 165; 
+  double x6 = 429; 
+  double y6 = 125; 
+  
+  circleLineIntersection(circle_x, circle_y, radius, x6, y6, x5, y5); 
+  }</pre>
 <p></p>
 <h1>w16</h1>
 <h1>Brython</h1>
