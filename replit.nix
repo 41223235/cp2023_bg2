@@ -1,5 +1,6 @@
-{pkgs}: {
-  deps = [
-    pkgs.libev
-  ];
+{ pkgs }: {
+    deps = [
+      pkgs.libev
+      pkgs.gnuplot
+    ];
 }
